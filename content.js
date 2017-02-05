@@ -3,8 +3,12 @@
 
 // Globals
 var $ = jQuery;
+var classified_posts = 0;
 
-flagPosts();
+window.setInterval(function(){
+  flagPosts();
+}, 4000);
+
 
 
 chrome.extension.onRequest.addListener(function(request, sender, sendResponse) {
@@ -65,31 +69,22 @@ function addOverlay(el) {
 	parent.append(overlay);
 }
 
-function isPostFake(post) {
-	var post_title = $(post).find('._6m6').text();
-	var post_domain = $(post).find("._6mb").text().split("|")[0];
-	if (post_title.length && post_domain.length) {
-		if (post_domain.includes("buzzfeed")) {
-			return true;
-		}
-	}
-	return false;
-}
-
 function flagPosts() {
 	//Finds all posts, if post is fake, put an overlay on it
 	let post_list = $("div[role='article']");
 	console.log(post_list);
 	console.log(post_list[0]);
 
+	var current_posts = post_list.length;
 	// Overlay fake articles
-	for ( var i = 0; i < post_list.length; i++) {
+	for ( var i = classified_posts; i < current_posts; i++) {
 		var fake_post = $(post_list.get(i));
 		if (isPostFake(fake_post)) {
 			console.log(fake_post);
 			addOverlay(fake_post);
 		}
 	}
+	classified_posts = current_posts;
 
 	//post_list[0].style.display = "none";
 	return post_list;
@@ -105,4 +100,24 @@ function findDivsById(start_substr) {
 		}
 	}
 	return ret_list;
+}
+
+function isPostFake(post) {
+	//Prepare the features
+	var post_title = $(post).find('._6m6').text();
+	var post_domain = $(post).find("._6mb").text().split("|")[0];
+	if (post_title.length && post_domain.length) {
+		var post_link = $(post).find("._3ekx");
+		var post_url = $(post_link).find('a').attr("onmouseover");
+		console.log("Finding URL");
+		console.log(post_url);
+	}
+
+	//Send get request with features (?)
+	if (post_title.length && post_domain.length) {
+		if (post_domain.includes("buzzfeed") || post_domain.includes("breitbart")) {
+			return true;
+		}
+	}
+	return false;
 }
