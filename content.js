@@ -14,6 +14,8 @@ function getVerificationOverlayHTML(post_title, post_domain, post_url) {
 }
 
 function verificationButtonClickHandler() {
+	$(this).attr("title", "Your response has been recorded!");
+	$(this).tooltip();
 	let post_title = $(this).data('title');
 	let post_classification = $(this).data('classification');
 	let post_url = $(this).data('url');
