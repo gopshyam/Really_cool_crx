@@ -1,16 +1,99 @@
+
+"use strict";
+
+// Globals
+var $ = jQuery;
+
+flagPosts();
+
+
 chrome.extension.onRequest.addListener(function(request, sender, sendResponse) {
+
 	console.log("request received");
- if (request.action == "getDOM") {
- 	content_doc = document;
- 	console.log(document.getElementsByTagName("div"));
-   	sendResponse({dom: document.getElementsByTagName("div")});
- } else if (request.action == "getDivs") {
- 	console.log("getDivs");
- 	var ret_list = findDivsById("thing_");
- 	sendResponse(ret_list);
-   sendResponse({});
-   } // Send nothing..
+ 	if (request.action == "getDOM") {
+ 		content_doc = document;
+ 		console.log(document.getElementsByTagName("div"));
+   		sendResponse({dom: document.getElementsByTagName("div")});
+ 	} else if (request.action == "getDivs") {
+ 		console.log("getDivs");
+ 		var ret_list = findDivsById("thing_");
+ 		sendResponse(ret_list);
+    	sendResponse({});
+   	} else if (request.action == "getPosts") {
+   		console.log("getPosts request received");
+   		flagPosts();
+   		sendResponse();
+   	}
 });
+
+function logAllShares() {
+	var post_list = $("div[role='article']");
+	var post, title;
+	for (var i = 0; i < post_list.length; i++) {
+		post = $(post_list[i]);
+		title = getPostTitle(post);
+		console.log(title);
+		if (title.length) {
+			console.log($(title).text());
+			$(title).html("SlickBits Win Hackathon, Become Billionaires")
+			console.log($(post).find("._6mb").text().split("|")[0]);
+		}
+	}
+}
+
+
+function addOverlay(el) {
+	let parent = el.parent();
+	let overlay = $("<div></div>");
+
+	// Overlay setup
+	let width = el.width();
+	let height = el.height();
+	overlay.width(width);
+	overlay.height(height);
+	overlay.css({
+		"background-color": "red",
+		"z-index": "100"
+	});
+
+	el.css({
+		"opacity": "0.5"
+	});
+
+	// Parent > overlay > el
+	overlay.append(el);
+	parent.append(overlay);
+}
+
+function isPostFake(post) {
+	var post_title = $(post).find('._6m6').text();
+	var post_domain = $(post).find("._6mb").text().split("|")[0];
+	if (post_title.length && post_domain.length) {
+		if (post_domain.includes("buzzfeed")) {
+			return true;
+		}
+	}
+	return false;
+}
+
+function flagPosts() {
+	//Finds all posts, if post is fake, put an overlay on it
+	let post_list = $("div[role='article']");
+	console.log(post_list);
+	console.log(post_list[0]);
+
+	// Overlay fake articles
+	for ( var i = 0; i < post_list.length; i++) {
+		var fake_post = $(post_list.get(i));
+		if (isPostFake(fake_post)) {
+			console.log(fake_post);
+			addOverlay(fake_post);
+		}
+	}
+
+	//post_list[0].style.display = "none";
+	return post_list;
+}
 
 function findDivsById(start_substr) {
 	var div_list = document.getElementsByTagName("div");

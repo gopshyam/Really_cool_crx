@@ -58,7 +58,7 @@ document.addEventListener('DOMContentLoaded', function() {
     var dom;
     chrome.tabs.getSelected(null, function(tab) {
     // Send a request to the content script.
-      chrome.tabs.sendRequest(tab.id, {action: "getDivs"}, function(response) {
+      chrome.tabs.sendRequest(tab.id, {action: "getPosts"}, function(response) {
 
       pageDivs = response;
       //parseDom(pageDivs);

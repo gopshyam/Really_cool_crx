@@ -7,8 +7,9 @@
 
   "content_scripts": [
     {
-      "matches": ["https://www.reddit.com/*"],
-      "js": ["content.js"]
+      "matches": ["https://www.facebook.com/*"],
+      "js": ["jquery-3.1.1.min.js","content.js"],
+      "run_at": "document_idle"
     }
   ],
   "browser_action": {
