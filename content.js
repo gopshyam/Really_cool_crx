@@ -5,19 +5,20 @@
 var $ = jQuery;
 var classified_posts = 0;
 
-var post_url = "https://localhost:8080/classifyPost"
+var ajax_server_url = "https://localhost:8080/classifyPost"
 
-function getVerificationOverlayHTML(post_title) {
-	let verificationOverlayHTML = "<div class='verification-message'>Help SlickBits get better! Is this post fake? <span style='float:right'><button class='slickbits-overlay-button' data-classification='real' data-title=" + encodeURIComponent(post_title) + ">Nope</button><button class='slickbits-overlay-button' data-classification='fake' data-title=" + encodeURIComponent(post_title) + ">Yes, this is Fake News</button></span></div><hr>";
+function getVerificationOverlayHTML(post_title, post_domain, post_url) {
+	let verificationOverlayHTML = "<div class='verification-message'>Help SlickBits get better! Is this post fake? <span style='float:right'><button class='slickbits-overlay-button' data-classification='real' data-title=" + encodeURIComponent(post_title) + " data-domain=" + encodeURIComponent(post_domain) + " data-url=" + encodeURIComponent(post_url) + ">Nope</button><button class='slickbits-overlay-button' data-classification='fake' data-title=" + encodeURIComponent(post_title) + " data-domain=" + encodeURIComponent(post_domain) + " data-url=" + encodeURIComponent(post_url) + ">Yes, this is Fake News</button></span></div><hr>";
 	return verificationOverlayHTML;
 }
 
 function verificationButtonClickHandler() {
-	//console.log("Sending user data...");
 	let post_title = $(this).data('title');
 	let post_classification = $(this).data('classification');
-  let cur_post_url = post_url + "?x=" + post_title + "&y=" + post_classification;
-$.post(cur_post_url, '', function(data) {console.log("RESPONSE RECEIVED" + data);})
+	let post_url = $(this).data('url');
+	let post_domain = $(this).data('domain');
+  	let cur_post_url = ajax_server_url + "?title=" + post_title + "&url=" + post_url + "&domain=" + post_domain + "&y=" + post_classification;
+$.post(cur_post_url, '', function(data) {console.log("RESPONSE RECEIVED " + data);})
 
 
 }
@@ -54,11 +55,8 @@ function logAllShares() {
 	for (var i = 0; i < post_list.length; i++) {
 		post = $(post_list[i]);
 		title = getPostTitle(post);
-		console.log(title);
 		if (title.length) {
-			console.log($(title).text());
 			$(title).html("SlickBits Win Hackathon, Become Billionaires")
-			console.log($(post).find("._6mb").text().split("|")[0]);
 		}
 	}
 }
@@ -90,8 +88,6 @@ function addOverlay(el) {
 function flagPosts() {
 	//Finds all posts, if post is fake, put an overlay on it
 	let post_list = $("._5pcr[role='article']");
-	console.log(post_list);
-	console.log(post_list[0]);
 
 	var current_posts = post_list.length;
 	// Overlay fake articles
@@ -120,8 +116,8 @@ function findDivsById(start_substr) {
 	return ret_list;
 }
 
-function addUserVerificationOverlay(post, post_title) {
-	$(post).prepend(getVerificationOverlayHTML(post_title));
+function addUserVerificationOverlay(post, post_title, post_domain, post_url) {
+	$(post).prepend(getVerificationOverlayHTML(post_title, post_domain, post_url));
 	$('.slickbits-overlay-button').unbind('click');
 	$('.slickbits-overlay-button').click(verificationButtonClickHandler);
 }
@@ -133,9 +129,9 @@ function isPostFake(post) {
 	var post_domain = $(post).find("._6mb").text().split("|")[0];
 	if (post_title.length && post_domain.length) {
 
-		addUserVerificationOverlay(post, post_title);
 		var post_link = $(post).find("._3ekx");
 		var post_url = $(post_link).find('a').attr("href");
+		addUserVerificationOverlay(post, post_title, post_domain, post_url);
 	}
 
 	//Send get request with features (?)
