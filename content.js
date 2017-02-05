@@ -95,6 +95,7 @@ function flagPosts() {
 		var fake_post = $(post_list.get(i));
 		if (isPostFake(fake_post)) {
 			console.log(fake_post);
+			addUserVerificationOverlay(fake_post);
 			addOverlay(fake_post);
 		}
 	}
@@ -116,7 +117,13 @@ function findDivsById(start_substr) {
 	return ret_list;
 }
 
-function addUserVerificationOverlay(post, post_title, post_domain, post_url) {
+function addUserVerificationOverlay(post) {
+	var post_title = $(post).find('._6m6').text();
+	var post_domain = $(post).find("._6mb").text().split("|")[0];
+	if (post_title.length && post_domain.length) {
+		var post_link = $(post).find("._3ekx");
+		var post_url = $(post_link).find('a').attr("href");
+	}
 	$(post).prepend(getVerificationOverlayHTML(post_title, post_domain, post_url));
 	$('.slickbits-overlay-button').unbind('click');
 	$('.slickbits-overlay-button').click(verificationButtonClickHandler);
@@ -131,7 +138,7 @@ function isPostFake(post) {
 
 		var post_link = $(post).find("._3ekx");
 		var post_url = $(post_link).find('a').attr("href");
-		addUserVerificationOverlay(post, post_title, post_domain, post_url);
+		
 	}
 
 	//Send get request with features (?)
