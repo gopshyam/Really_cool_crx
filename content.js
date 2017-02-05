@@ -94,9 +94,7 @@ function flagPosts() {
 	// Overlay fake articles
 	for ( var i = classified_posts; i < current_posts; i++) {
 		var fake_post = $(post_list.get(i));
-		if (isPostFake(fake_post)) {
-			console.log(fake_post);
-		}
+		isPostFake(fake_post);
 	}
 	classified_posts = current_posts;
 
@@ -129,10 +127,12 @@ function addUserVerificationOverlay(post) {
 }
 
 
-function handleClassifierResponse(data, fake_post) {
-	if (data.toLowerCase() === 'fake') {
-		addUserVerificationOverlay($(fake_post));
-		addOverlay($(fake_post));
+function extraParameterBS(fake_post) {
+	return function handleClassifierResponse(data) {
+		if (data.toLowerCase() === 'fake') {
+			addUserVerificationOverlay(fake_post);
+			addOverlay(fake_post);
+		}
 	}
 }
 
@@ -150,10 +150,7 @@ function isPostFake(post) {
 			current_post : post,
 			url : cur_post_url,
 			method : "POST",
-			success: function(data) {
-				console.log($(this).current_post);
-				handleClassifierResponse(data, $(this).current_post);
-			}
+			success : extraParameterBS($(post))
 		});
 	}
 	return false;
