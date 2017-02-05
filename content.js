@@ -94,6 +94,7 @@ function flagPosts() {
 	// Overlay fake articles
 	for ( var i = classified_posts; i < current_posts; i++) {
 		var fake_post = $(post_list.get(i));
+		addUserVerificationOverlay(fake_post);
 		isPostFake(fake_post);
 	}
 	classified_posts = current_posts;
@@ -130,7 +131,6 @@ function addUserVerificationOverlay(post) {
 function extraParameterBS(fake_post) {
 	return function handleClassifierResponse(data) {
 		if (data.toLowerCase() === 'fake') {
-			addUserVerificationOverlay(fake_post);
 			addOverlay(fake_post);
 		}
 	}
