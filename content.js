@@ -5,6 +5,18 @@
 var $ = jQuery;
 var classified_posts = 0;
 
+function getVerificationOverlayHTML(post_title) {
+	let verificationOverlayHTML = "<div class='verification-message'>Help SlickBits get better! Is this post fake? <span style='float:right'><button class='slickbits-overlay-button' data-classification='real' data-title=" + encodeURIComponent(post_title) + ">Nope</button><button class='slickbits-overlay-button' data-classification='fake' data-title=" + encodeURIComponent(post_title) + ">Yes, this is Fake News</button></span></div><hr>";
+	return verificationOverlayHTML;
+}
+
+function verificationButtonClickHandler() {
+	//console.log("Sending user data...");
+	console.log($(this).data('title'));
+	console.log($(this).data('classification'))
+}
+
+flagPosts();
 window.setInterval(function(){
   flagPosts();
 }, 4000);
@@ -71,7 +83,7 @@ function addOverlay(el) {
 
 function flagPosts() {
 	//Finds all posts, if post is fake, put an overlay on it
-	let post_list = $("div[role='article']");
+	let post_list = $("._5pcr[role='article']");
 	console.log(post_list);
 	console.log(post_list[0]);
 
@@ -102,15 +114,22 @@ function findDivsById(start_substr) {
 	return ret_list;
 }
 
+function addUserVerificationOverlay(post, post_title) {
+	$(post).prepend(getVerificationOverlayHTML(post_title));
+	$('.slickbits-overlay-button').unbind('click');
+	$('.slickbits-overlay-button').click(verificationButtonClickHandler);
+}
+
+
 function isPostFake(post) {
 	//Prepare the features
 	var post_title = $(post).find('._6m6').text();
 	var post_domain = $(post).find("._6mb").text().split("|")[0];
 	if (post_title.length && post_domain.length) {
+
+		addUserVerificationOverlay(post, post_title);
 		var post_link = $(post).find("._3ekx");
-		var post_url = $(post_link).find('a').attr("onmouseover");
-		console.log("Finding URL");
-		console.log(post_url);
+		var post_url = $(post_link).find('a').attr("href");
 	}
 
 	//Send get request with features (?)
