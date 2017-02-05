@@ -5,7 +5,8 @@
 var $ = jQuery;
 var classified_posts = 0;
 
-var ajax_server_url = "https://localhost:8080/classifyPost"
+var ajax_classify_server_url = "https://localhost:8080/classifyPost";
+var ajax_feed_server_url = "https://localhost:8080/feedPost";
 
 function getVerificationOverlayHTML(post_title, post_domain, post_url) {
 	let verificationOverlayHTML = "<div class='verification-message'>Help SlickBits get better! Is this post fake? <span style='float:right'><button class='slickbits-overlay-button' data-classification='real' data-title=" + encodeURIComponent(post_title) + " data-domain=" + encodeURIComponent(post_domain) + " data-url=" + encodeURIComponent(post_url) + ">Nope</button><button class='slickbits-overlay-button' data-classification='fake' data-title=" + encodeURIComponent(post_title) + " data-domain=" + encodeURIComponent(post_domain) + " data-url=" + encodeURIComponent(post_url) + ">Yes, this is Fake News</button></span></div><hr>";
@@ -17,7 +18,7 @@ function verificationButtonClickHandler() {
 	let post_classification = $(this).data('classification');
 	let post_url = $(this).data('url');
 	let post_domain = $(this).data('domain');
-  	let cur_post_url = ajax_server_url + "?title=" + post_title + "&url=" + post_url + "&domain=" + post_domain + "&y=" + post_classification;
+  	let cur_post_url = ajax_feed_server_url + "?title=" + post_title + "&url=" + post_url + "&domain=" + post_domain + "&y=" + post_classification;
 $.post(cur_post_url, '', function(data) {console.log("RESPONSE RECEIVED " + data);})
 
 
@@ -95,8 +96,6 @@ function flagPosts() {
 		var fake_post = $(post_list.get(i));
 		if (isPostFake(fake_post)) {
 			console.log(fake_post);
-			addUserVerificationOverlay(fake_post);
-			addOverlay(fake_post);
 		}
 	}
 	classified_posts = current_posts;
@@ -130,6 +129,13 @@ function addUserVerificationOverlay(post) {
 }
 
 
+function handleClassifierResponse(data, fake_post) {
+	if (data.toLowerCase() === 'fake') {
+		addUserVerificationOverlay(fake_post);
+		addOverlay(fake_post);
+	}
+}
+
 function isPostFake(post) {
 	//Prepare the features
 	var post_title = $(post).find('._6m6').text();
@@ -138,14 +144,17 @@ function isPostFake(post) {
 
 		var post_link = $(post).find("._3ekx");
 		var post_url = $(post_link).find('a').attr("href");
-		
-	}
 
-	//Send get request with features (?)
-	if (post_title.length && post_domain.length) {
-		if (post_domain.includes("buzzfeed") || post_domain.includes("breitbart")) {
-			return true;
-		}
+  		let cur_post_url = ajax_classify_server_url + "?title=" + post_title + "&url=" + post_url + "&domain=" + post_domain;
+		$.ajax({
+			current_post : post,
+			url : cur_post_url,
+			method : "POST",
+			success: function(data) {
+				console.log($(this).current_post);
+				handleClassifierResponse(data, $(this).current_post);
+			}
+		});
 	}
 	return false;
 }
