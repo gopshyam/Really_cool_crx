@@ -64,7 +64,7 @@ function logAllShares() {
 
 
 function addOverlay(el) {
-	let parent = el.parent();
+	let parent = $(el).parent();
 	let overlay = $("<div></div>");
 
 	// Overlay setup
@@ -131,8 +131,8 @@ function addUserVerificationOverlay(post) {
 
 function handleClassifierResponse(data, fake_post) {
 	if (data.toLowerCase() === 'fake') {
-		addUserVerificationOverlay(fake_post);
-		addOverlay(fake_post);
+		addUserVerificationOverlay($(fake_post));
+		addOverlay($(fake_post));
 	}
 }
 
