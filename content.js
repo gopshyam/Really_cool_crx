@@ -62,7 +62,6 @@ function logAllShares() {
 	}
 }
 
-
 function addOverlay(el) {
 	let parent = $(el).parent();
 	let overlay = $("<div></div>");
@@ -72,13 +71,16 @@ function addOverlay(el) {
 	let height = el.height();
 	overlay.width(width);
 	overlay.height(height);
+  /*
 	overlay.css({
-		"background-color": "red",
-		"z-index": "100"
+		"background-color": "#EEE",
 	});
+  */
+  overlay.addClass("fake-news-post");
 
 	el.css({
-		"opacity": "0.5"
+		"opacity": "0.35",
+    "border-radius": "0.35em"
 	});
 
 	// Parent > overlay > el
