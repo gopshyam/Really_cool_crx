@@ -5,6 +5,9 @@
 var $ = jQuery;
 var classified_posts = 0;
 
+var post_url = "https://localhost:8080/classifyPost?x=testtest"
+$.post(post_url, "abd", function(data) {console.log("RESPONSE RECEIVED" + data);})
+
 function getVerificationOverlayHTML(post_title) {
 	let verificationOverlayHTML = "<div class='verification-message'>Help SlickBits get better! Is this post fake? <span style='float:right'><button class='slickbits-overlay-button' data-classification='real' data-title=" + encodeURIComponent(post_title) + ">Nope</button><button class='slickbits-overlay-button' data-classification='fake' data-title=" + encodeURIComponent(post_title) + ">Yes, this is Fake News</button></span></div><hr>";
 	return verificationOverlayHTML;
